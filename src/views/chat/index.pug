@@ -1,0 +1,20 @@
+doctype html
+html(lang="ja")
+	head
+		meta(charset="utf-8")
+	body
+		h1 投稿一覧
+		a(href="/chat/new") 新規メッセージ作成
+
+
+		section
+			each msg in messages
+				hr
+				div
+					h2 #{msg.username}
+					time #{msg.date}
+					p #{msg.message}
+				if msg.image_path
+					img(src="/image/" + msg.image_path)
+
+			a(href="/") トップページへ

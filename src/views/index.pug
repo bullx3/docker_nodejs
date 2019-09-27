@@ -1,0 +1,25 @@
+doctype html
+html(lang="ja")
+	head
+		meta(charset="utf-8")
+	body
+
+		if user
+			nav
+				span Hello! 
+					span #{user.username}
+				a(href="/logout") <ログアウト>
+		else
+			a(href="/login") ログイン
+
+		h1 メインページ
+		if !user
+			div
+				h4 ログインされていません
+		div
+			a(href="/chat") メッセージ一覧へ
+		div
+			a(href="/signin") ユーザ登録
+		div
+
+

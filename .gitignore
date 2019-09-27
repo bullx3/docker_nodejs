@@ -1,0 +1,10 @@
+# image file directory
+
+/src/image/*
+
+!/src/image/.gitkeep
+
+
+# node_modules
+
+/src/node_modules/
