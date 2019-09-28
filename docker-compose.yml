@@ -20,7 +20,7 @@ services:
 #      MY_MONGO_PASS: pass
 
   mongo_db:
-    image: mongo
+    image: mongo:4.2
     restart: always
     container_name: node_mongo_db
 #    environment:

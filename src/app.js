@@ -9,6 +9,7 @@ var fileUpload = require('express-fileupload');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var session = require('express-session');
+var MongoStore = require('connect-mongo')(session)
 
 // Schema
 var Message = require('./schema/Message');
@@ -47,7 +48,9 @@ mongoose.connect(mongodb_url,{ useNewUrlParser: true, useUnifiedTopology: true},
 
 app.use(bodyparser());
 
-app.use(session({secret: 'HogeFuga'}));
+app.use(session({ secret: 'HogeFuga',
+                  store: new MongoStore({mongooseConnection: mongoose.connection})
+                }));
 app.use(passport.initialize());
 app.use(passport.session());
 
