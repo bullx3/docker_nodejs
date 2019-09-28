@@ -21,6 +21,7 @@ docker-compose構成
     ・画像アップロード
     ・passport(+ passport-local)を使ったローカル認証
     ・seesionにmongodb(mongoose)を使用
+    ・sessionのオプション指定
 
 ## Demo
 

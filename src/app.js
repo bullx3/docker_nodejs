@@ -49,7 +49,11 @@ mongoose.connect(mongodb_url,{ useNewUrlParser: true, useUnifiedTopology: true},
 app.use(bodyparser());
 
 app.use(session({ secret: 'HogeFuga',
-                  store: new MongoStore({mongooseConnection: mongoose.connection})
+                  cookie: {maxAge: 24*60*60*1000},  // cookieの有効期間（この指定がないとブアウザ終了時破棄される）
+//                  rolling: true,                  // trueにするとアクセスする度に有効期限が伸びる(default:false)
+                  saveUninitialized: false,         // trueにすると」初期化されていないセッションを強制的に保存する
+                  resave: false,                    // Storeに合わせて変更(mongodb->false).defaultはtrue
+                  store: new MongoStore({mongooseConnection: mongoose.connection}) // storeにmongodbを設定
                 }));
 app.use(passport.initialize());
 app.use(passport.session());
