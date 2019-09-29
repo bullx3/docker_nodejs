@@ -9,7 +9,15 @@ var fileUpload = require('express-fileupload');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var session = require('express-session');
-var MongoStore = require('connect-mongo')(session)
+
+// SessionStoreで使用するミドルウエアを選択
+const EnvSessonStore = process.env.MY_SESSION_STORE;
+if (EnvSessonStore == 'redis'){
+	var redis = require('redis');
+	var RedisStore = require('connect-redis')(session);
+} else if(EnvSessonStore == 'mongo'){
+	var MongoStore = require('connect-mongo')(session);
+}
 
 // Schema
 var Message = require('./schema/Message');
@@ -43,18 +51,42 @@ mongoose.connect(mongodb_url,{ useNewUrlParser: true, useUnifiedTopology: true},
 	}
 });
 
+if (EnvSessonStore == 'redis'){
+	// redisサーバーへのアクセス
+	var redis_client = redis.createClient({
+				host: process.env.MY_REDIS_HOST,
+				port: process.env.MY_REDIS_PORT
+				}
+	);
 
+	// redisのエラーハンドラ
+	redis_client.on("error", function (err) {
+	    console.log("redis Error " + err);
+	});
+}
 
 
 app.use(bodyparser());
 
-app.use(session({ secret: 'HogeFuga',
-                  cookie: {maxAge: 24*60*60*1000},  // cookieの有効期間（この指定がないとブアウザ終了時破棄される）
-//                  rolling: true,                  // trueにするとアクセスする度に有効期限が伸びる(default:false)
-                  saveUninitialized: false,         // trueにすると」初期化されていないセッションを強制的に保存する
-                  resave: false,                    // Storeに合わせて変更(mongodb->false).defaultはtrue
-                  store: new MongoStore({mongooseConnection: mongoose.connection}) // storeにmongodbを設定
-                }));
+// 使うStoreにより切り分け
+var session_opts = {
+	secret: 'HogeFuga',               // 必須. 任意の文字列
+	name: 'hogesession',              // cookie名セキュリティ上デフォルトからは変えた方がいい
+	cookie: {maxAge: 24*60*60*1000},  // cookieの有効期間（この指定がないとブアウザ終了時破棄される）
+	// rolling: true,                  // trueにするとアクセスする度に有効期限が伸びる(default:false)
+};
+
+if (EnvSessonStore == 'redis'){
+	session_opts["saveUninitialized"] = false;	// trueにすると初期化されていないセッションを強制的に保存する
+	session_opts["resave"] = false;				// Storeに合わせて変更(redis->false).defaultはtrue
+	session_opts["store"] = new RedisStore({ client: redis_client }) // storeにredisを設定
+} else if(EnvSessonStore == 'mongo'){
+	session_opts["saveUninitialized"] = false;	// trueにすると初期化されていないセッションを強制的に保存する
+	session_opts["resave"] = false;				// Storeに合わせて変更(mongodb->false).defaultはtrue
+	session_opts["store"] = new MongoStore({mongooseConnection: mongoose.connection}) // storeにmongodbを設定
+} /* 'memory' その他の場合はdefault */
+
+app.use(session(session_opts));
 app.use(passport.initialize());
 app.use(passport.session());
 

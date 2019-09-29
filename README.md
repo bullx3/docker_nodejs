@@ -22,6 +22,7 @@ docker-compose構成
     ・passport(+ passport-local)を使ったローカル認証
     ・seesionにmongodb(mongoose)を使用
     ・sessionのオプション指定
+    ・sessionにredisを指定可能にした(環境変数で切り替え可能)
 
 ## Demo
 
@@ -71,11 +72,11 @@ expressの起動（nodejsコンテナのbashから）
 
 バージョン指定
 
-    $ npm install alert@1.0.0 assert@2.0.0 body-parser@1.19.0 connect-mongo@3.0.0 express@4.17.1 express-fileupload@1.1.6-alpha.5 express-session@1.16.2 mongodb@3.3.2 mongoose@5.7.1 passport@0.4.0 passport-local@1.0.0 pug@2.0.4
+    $ npm install alert@1.0.0 assert@2.0.0 body-parser@1.19.0 connect-mongo@3.0.0 connect-redis@4.0.2 express@4.17.1 express-fileupload@1.1.6-alpha.5 express-session@1.16.2 mongodb@3.3.2 mongoose@5.7.1 passport@0.4.0 passport-local@1.0.0 pug@2.0.4 redis@2.8.0
 
 最新版
 
-    $ npm install alert assert body-parser connect-mongo express express-fileupload express-session mongodb mongoose passport passport-local pug
+    $ npm install alert assert body-parser connect-mongo connect-redis express express-fileupload express-session mongodb mongoose passport passport-local pug redis
 
 
 ## Contribution

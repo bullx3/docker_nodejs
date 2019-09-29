@@ -5,6 +5,7 @@ services:
     image: node:12
     depends_on:
       - mongo_db
+      - session_store
     container_name: nodejs
     volumes:
       - "./:/mydata/"
@@ -18,6 +19,9 @@ services:
       MY_MONGO_DB_NAME: myapp
 #      MY_MONGO_USER: user
 #      MY_MONGO_PASS: pass
+      MY_SESSION_STORE: "redis"  # "redis","mongo","memory"から選択可能。省略はmemoryになる
+      MY_REDIS_HOST: session_store
+      MY_REDIS_PORT: 6379
 
   mongo_db:
     image: mongo:4.2
@@ -45,7 +49,29 @@ services:
 #      ME_CONFIG_MONGODB_ADMINPASSWORD: pass
       ME_CONFIG_MONGODB_SERVER: mongo_db
       ME_CONFIG_MONGODB_PORT: 27017
+
+  session_store:
+    image: redis:5.0
+    restart: always
+    container_name: redis_store
+    ports:
+      - 6391:6379
+    volumes:
+      - "session_data:/data"
+
+  redis_commander:
+    image: rediscommander/redis-commander:latest
+    depends_on:
+      - session_store
+    container_name: redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:session_store:6379
+    ports:
+      - "9002:8081"
+
 volumes:
   mongo_data:
   mongo_config:
+  session_data:
 
